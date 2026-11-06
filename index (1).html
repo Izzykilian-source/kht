@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Karhutla Terkendali™ – Game Satire</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1512;--fg:#e9f0ea;--card:#18221c;--mut:#9db0a2;--ac:#ff7a2f;--line:#2a3a30;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1512;--fg:#e9f0ea;--card:#18221c;--mut:#9db0a2;--line:#2a3a30}}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;--bg:#f3f1ea;--fg:#1b241e;--card:#ffffff;--mut:#5b6b60;--line:#d6d9cf}}
+:root[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px;line-height:1.45}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:1.25rem;margin:0 0 8px}h1 span{color:var(--ac)}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:8px}
+.s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.8rem;color:var(--mut)}
+.s b{display:block;color:var(--fg);font-size:1rem}
+.bar{height:6px;background:var(--line);border-radius:4px;margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#3aa0ff}
+#stage{position:relative}
+canvas{display:block;width:100%;border-radius:12px;border:1px solid var(--line);touch-action:none;cursor:crosshair;background:#1d3a22}
+#ev{position:absolute;left:8px;right:8px;top:8px;background:#201208ee;color:#ffd7b0;border:1px solid var(--ac);border-radius:10px;padding:8px 12px;font-size:.9rem;opacity:0;transform:translateY(-8px);transition:.3s;pointer-events:none}
+#ev.show{opacity:1;transform:none}
+.ov{position:absolute;inset:0;background:#0b100dee;color:#e9f0ea;border-radius:12px;display:flex;padding:14px;overflow:auto}
+.ov.hide{display:none}#ovMsg{position:fixed;z-index:50;border-radius:0;padding:max(14px,env(safe-area-inset-top)) 14px 24px}
+.box{max-width:560px;margin:auto}.box h2{margin:0 0 6px;font-size:1.3rem}.box p{margin:6px 0;font-size:.92rem}
+.box small{color:#9db0a2}
+button{background:var(--ac);color:#1a0d04;border:0;border-radius:10px;padding:10px 18px;font-weight:700;font-size:1rem;cursor:pointer;margin-top:10px}
+.tick{margin-top:8px;font-size:.82rem;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;min-height:2.4em}
+.leg{font-size:.75rem;color:var(--mut);margin-top:6px}@keyframes shk{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(3px,2px)}}canvas.shake{animation:shk .45s}canvas.quake{animation:shk .12s linear infinite}.tools{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap;align-items:center}.tools button{margin:0;padding:8px 12px;font-size:.85rem;background:var(--card);color:var(--fg);border:1px solid var(--line)}.tools button.on{background:var(--ac);color:#1a0d04;border-color:var(--ac)}.tools .s{padding:6px 10px}.tools .s b{display:inline}button:disabled{opacity:.4;cursor:not-allowed}button.up{background:#2f6b3a;color:#fff;font-size:.85rem;padding:8px 12px;margin:3px 0}
+</style></head><body><div class="wrap">
+<h1>🔥 Karhutla <span>Terkendali™</span> <small style="font-weight:400;color:var(--mut)">— edisi rapat koordinasi, api tidak diundang</small></h1>
+<div class="hud">
+<div class="s">Hari<b id="hDay">1/4</b><div class="bar"><i id="bDay" style="background:#ffb347"></i></div></div>
+<div class="s">Hutan tersisa<b id="hFor">100%</b></div>
+<div class="s">Satwa selamat<b id="hAni">0</b></div>
+<div class="s">Udara (ISPU)<b id="hAqi">Baik</b></div>
+<div class="s">Tangki air<b id="hTank">100%</b><div class="bar"><i id="bTank"></i></div></div>
+<div class="s">Respons pemerintah<b id="hGov">0%</b><div class="bar"><i id="bGov" style="background:#9aa"></i></div></div>
+</div>
+<div class="tools"><button id="tW" class="on">💧 Semprot (1)</button><button id="tC">🚧 Sekat kanal ×<span id="nC">6</span> (2)</button><button id="tM">🔊</button><span class="s">⭐ Poin <b id="hPts">0</b></span><span class="s">🌬️ Angin <b id="hWind">•</b></span></div><div id="stage"><canvas id="c"></canvas><div id="ev"></div>
+<div class="ov" id="ovStart"><div class="box"><h2>🔥 Karhutla Terkendali™</h2>
+<p>Hutan terbakar, satwa panik, udara menghitam. Kamu adalah warga yang turun tangan sendiri karena bantuan “sedang dalam proses”.</p>
+<p><b>Cara main:</b> tahan dan geser pada peta untuk menyemprot air. Air terbatas dan terisi ulang saat kamu berhenti menyemprot. Lahan <b>gambut</b> (hijau gelap) membara lebih lama dan bisa menyala lagi. Cara menang: tidak ada. Estimasi lama bertugas: sekitar 15 detik, sesuai realisasi anggaran pencegahan.</p>
+<p><b>Sekat kanal 🚧:</b> pilih alat ini lalu ketuk satu petak hutan untuk dijadikan kanal sekat (mengorbankan satu pohon). Api tidak bisa melintas dan gambut di sekitarnya terbasahi. <b>Angin 🌬️</b> mempercepat api searah hembusannya. <b>Poin ⭐</b> dari api yang kamu padamkan dipakai membeli swadaya warga tiap akhir hari.</p><p>Waspadai “kebijakan” yang bisa muncul kapan saja.</p>
+<button id="go">Mulai bertugas</button>
+<p><small>Game satire untuk edukasi. Sebagian kutipan terinspirasi pernyataan pejabat yang pernah dilaporkan media, ditampilkan tanpa menyebut nama.</small></p></div></div>
+<div class="ov hide" id="ovMsg"><div class="box" id="msg"></div></div></div>
+<div class="leg">🌲 hutan • hijau gelap = gambut • 🔥 api • 🦧🐅🦜🐘🐒🦌 satwa • garis biru = sungai (sekat api)</div>
+<div class="tick" id="tick"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const C=20,R=12,DAYT=40,DAYS=4,ANIM=['🦧','🐅','🦜','🐘','🐒','🦌'];
+const cv=$('c'),g=cv.getContext('2d');
+let dm=0,dmTxt='',rain=0,evN=0,tool=0,canals=6,pts=0,up={r:1,tk:100,rg:10},wind=[0,1],parts=[],G,cell=40,run=false,day=1,t=0,sp=0,ev=0,tank=100,aqi=25,gov=0,dead=0,total=0,photo=0,pause=0,ptr=null,last=0,fires=0,forest=100,maxAqi=0,evTimer;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function resize(){const w=$('stage').clientWidth;cell=Math.floor(w/C);cv.width=cell*C;cv.height=cell*R;cv.style.width='100%'}
+addEventListener('resize',resize);
+function ignite(c){if(c.t!==0||c.imm>0)return;c.t=1;c.hp=c.peat?5:1.5;c.life=c.peat?10:6}
+function init(full){
+ if(full){day=1;dead=0;maxAqi=0;up={r:1,tk:100,rg:10};pts=0;evN=0}
+ G=[];for(let r=0;r<R;r++){G[r]=[];for(let c=0;c<C;c++){const riv=c===9+Math.round(2*Math.sin(r/1.7));
+  G[r][c]={t:riv?3:0,peat:!riv&&c<8&&r>3&&Math.random()<.6,hp:0,life:0,imm:0,rk:0,a:null}}}
+ if(full||!total){total=0}
+ let n=16;while(n>0){const x=G[ri(0,R-1)][ri(0,C-1)];if(x.t===0&&!x.a){x.a=ANIM[ri(0,5)];n--}}
+ if(full)total=16;
+ t=0;sp=0;ev=0;tank=up.tk;canals=6;parts=[];wind=[[0,1],[0,-1],[1,0],[-1,0],[0,0]][ri(0,4)];aqi=Math.max(25,aqi*.5);gov=0;photo=0;pause=0;
+ for(let i=0;i<2+day;i++)ignite(G[ri(0,R-1)][ri(0,C-1)]);banner(['📅 Hari 1 — “Masa Imbauan”: pemerintah mengimbau api agar tidak menyebar.','📅 Hari 2 — “Rapat Koordinasi”: 14 rapat, 0 ember air.','📅 Hari 3 — “Studi Banding”: belajar memadamkan api di negeri orang.','📅 Hari 4 — “Pembentukan Satgas”: dibentuk setelah hutan nyaris habis.'][day-1]||'📅 Hari '+day+' — “Evaluasi atas Evaluasi”: rapat evaluasi dijadwalkan ulang.');
+}
+const EVENTS=[['Hujan turun. Pejabat: “Berkat kerja keras kami.” Padahal alam yang bekerja, bukan rapat.',()=>{for(const row of G)for(const x of row)if(x.t===1&&Math.random()<.6){x.t=0;x.imm=4}rain=5;burst(2.2,3200,.09)}],
+['Rapat koordinasi dimulai. Hasil rapat: rapat lanjutan. Pasokan air tersendat.',()=>{pause=5;gov=Math.max(0,gov-15)}],
+['Pejabat datang berfoto memegang selang. Selang diminta kembali. Semprotan terhenti sejenak.',()=>{photo=3.5}],
+['Izin konsesi baru terbit di tengah hutan. Kebetulan, area itu langsung terbakar.',()=>{const r=ri(1,R-2),c=ri(0,C-3);for(let i=0;i<3;i++)ignite(G[r+ri(-1,1)][c+ri(0,2)]||{t:9})}],
+['Pejabat: “Ini cuma kabut biasa.” Kualitas udara tidak setuju.',()=>{aqi+=45}],
+['Anggaran pemadaman dipotong demi seremoni peresmian. Air makin hemat.',()=>{tank=Math.min(tank,35);pause=4}],
+['Denda perusahaan pembakar lahan dibatalkan karena “kurang bukti”. Api tidak kekurangan bukti.',()=>{for(let i=0;i<3;i++)ignite(G[ri(0,R-1)][ri(0,C-1)])}],
+['Bantuan resmi cair setelah hutan habis. Terima kasih atas kesabarannya.',()=>{gov=Math.max(0,gov-10);aqi+=15}],['Studi banding ke luar negeri untuk mempelajari cara memadamkan api. Pesertanya berangkat, apinya tidak ikut.',()=>{pause=4;aqi+=10}],['Baliho “Tolak Karhutla” senilai miliaran terpasang di mana-mana. Ketersediaan air: tetap nol.',()=>{tank=Math.min(tank,25)}],['Sebuah “kebun rakyat” ratusan hektare mendadak terbakar di lahan milik pengusaha besar. Penyelidikan: menunggu.',()=>{const r=ri(1,R-2),c=ri(0,C-3);for(let i=0;i<5;i++)ignite(G[r+ri(-1,1)]?.[c+ri(0,2)]||{t:9})}],['Dibentuk Satgas Karhutla baru. Anggotanya 40 pejabat, selangnya 0.',()=>{gov=Math.max(0,gov-20);pause=3}],['Pidato resmi: “Tidak ada karhutla, yang ada hanya titik panas.” Titik panasnya bertambah.',()=>{for(let i=0;i<2;i++)ignite(G[ri(0,R-1)][ri(0,C-1)]);aqi+=10}],['Helikopter bantuan datang menjatuhkan air, lalu terbang kembali untuk jumpa pers.',()=>{let n=4;for(const row of G)for(const x of row)if(n>0&&x.t===1){x.t=0;x.imm=4;n--}photo=3}],['Relawan warga viral di media sosial. Pemerintah mengakuinya sebagai “prestasi daerah”. Relawan: belum digaji.',()=>{pts+=6}],['Izin lahan gambut diperpanjang demi investasi. Kanal pengering gambut dibuka lagi.',()=>{for(let i=0;i<8;i++){const x=G[ri(4,R-1)][ri(0,7)];if(x.t===0)x.peat=true}}],['Warga diimbau “jangan panik”. Warga tidak panik, hanya batuk.',()=>{aqi+=15}],['🎙️ Seorang pejabat: “Kita harus sabar, karena lahan yang terbakar sangat luas.” Api tidak ikut bersabar.',()=>{pause=4}],['🎙️ Seorang pejabat: “Tidak separah yang diberitakan.” Warga: “Kami batuk bukan karena berita.”',()=>{aqi+=30}],['🎙️ Seorang pejabat: “Jarak pandang masih bisa, belum banyak yang pakai masker. Kami juga tidak pakai masker.”',()=>{aqi+=35}],['🎙️ Seorang pejabat: “Negara tetangga menikmati oksigen gratis dari kita.” Asap pun dikirim gratis ke seberang.',()=>{aqi+=20;wind=[[0,1],[0,-1]][ri(0,1)]}],['🎙️ Seorang pejabat: “Musibah bisa datang kapan saja. Mari ikhlas dan berdoa.” Doa dipanjatkan, selang dilupakan.',()=>{photo=3.5}],['🎙️ Seorang pejabat bercanda soal api: “Bersatu kita teguh, bercerai kita kawin lagi.” Tidak ada yang tertawa.',()=>{gov=Math.max(0,gov-8);pause=2.5}],['🎙️ Seorang pejabat: “Helikopter water bombing tidak terlihat, berarti tidak parah lagi.” Api: “Terima kasih atas penilaiannya.”',()=>{for(let i=0;i<3;i++)ignite(G[ri(0,R-1)][ri(0,C-1)])}],['🎙️ Seorang pejabat: “Kondisi masih aman.” Kalimat berikutnya: sekolah diliburkan dan masker dibagikan.',()=>{aqi+=20}],['🎙️ Seorang pejabat dikritik, lalu menjawab: “Biarlah saya bodoh, tidak apa-apa.” Kritiknya tetap berlaku.',()=>{pause=3}],['🎙️ Seorang pejabat: “Belum terlihat mahasiswa turun.” Mahasiswa relawan: “Kami sudah di sini sejak kemarin.”',()=>{pts+=5}]
+];
+function puff(x,y,k){if(parts.length<350)parts.push({x,y,k,l:1,vx:(Math.random()-.5)*20,vy:k==='w'?30:-(15+Math.random()*25)})}function fireEvent(){wind=[[0,1],[0,-1],[1,0],[-1,0],[0,0]][ri(0,4)];evN++;sting();cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');const e=EVENTS[ri(0,EVENTS.length-1)];try{e[1]()}catch(_){}
+ const b=$('ev');b.textContent='📢 '+e[0];b.classList.add('show');clearTimeout(evTimer);evTimer=setTimeout(()=>b.classList.remove('show'),5000)}
+const NEWS=['Pejabat: “Titik api sudah terkendali.” Jumlah titik api: banyak.','Sekolah diliburkan karena asap. Anggaran seminar karhutla tetap berjalan.','Satwa dievakuasi ke hutan sebelah. Hutan sebelah juga terbakar.','Warga diminta memakai masker. Maskernya dibeli warga sendiri.','Pelaku pembakar lahan: “Saya cuma bersihkan kebun.” Status: sedang didalami.','Jarak pandang 50 meter. Pejabat: “Masih cukup untuk berfoto.”','Anak-anak batuk, hotel penuh tamu rapat evaluasi.','Pemerintah klaim titik api turun 100%. Satelit tidak ikut menandatangani.','Anggaran baliho imbauan: miliaran. Anggaran selang: sedang dikaji.','Pakar: gambut kering itu seperti sumbu. Pejabat: “Mari kita rapat dulu.”','Warga membuat sekat kanal sendiri. Pemerintah menyebutnya program unggulan.','Denda pembakar lahan: lebih murah daripada biaya rapat evaluasi.'];
+let ni=0;setInterval(()=>{$('tick').textContent='📰 '+NEWS[ni++%NEWS.length]},5500);$('tick').textContent='📰 '+NEWS[0];
+function spray(dt){const pc=Math.floor(ptr.x/cell),pr=Math.floor(ptr.y/cell);
+ const w=up.r;for(let dr=-w;dr<=w;dr++)for(let dc=-w;dc<=w;dc++){const x=G[pr+dr]?.[pc+dc];if(!x)continue;
+  if(x.t===1){x.hp-=dt*3.2;if(x.hp<=0){x.t=0;x.imm=4;pts++;for(let k=0;k<4;k++)puff((pc+dc+.5)*cell,(pr+dr+.5)*cell,'w');psh();if(x.peat&&Math.random()<.35)x.rk=3+Math.random()*3}}
+  else if(x.t===0)x.imm=Math.max(x.imm,1)}}
+function spread(){const ig=[];
+ for(let r=0;r<R;r++)for(let c=0;c<C;c++){const x=G[r][c];if(x.t!==1)continue;
+  for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=G[r+a]?.[c+b];if(n&&n.t===0&&Math.random()<.2+day*.04+(n.peat?.12:0)+(a===wind[0]&&b===wind[1]?.18:0))ig.push(n)}
+  if(Math.random()<.04){const n=G[r+ri(-3,3)]?.[c+ri(-3,3)];if(n&&n.t===0)ig.push(n)}}
+ ig.forEach(ignite);
+ for(let r=0;r<R;r++)for(let c=0;c<C;c++){const x=G[r][c];if(!x.a)continue;
+  if(x.t===1){x.a=null;dead++;continue}
+  const nb=[[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>G[r+a]?.[c+b]).filter(Boolean);
+  if(nb.some(n=>n.t===1)&&Math.random()<.65){const ok=nb.filter(n=>n.t===0&&!n.a);if(ok.length){const n=ok[ri(0,ok.length-1)];n.a=x.a;x.a=null}}}}
+function update(dt){
+ t+=dt;if(photo>0)photo-=dt;if(pause>0)pause-=dt;
+ if(ptr&&tank>0&&photo<=0){tank=Math.max(0,tank-30*dt);spray(dt);puff(ptr.x+ri(-25,25),ptr.y+ri(-25,25),'w')}
+ else if(pause<=0)tank=Math.min(up.tk,tank+up.rg*dt);
+ fires=0;let trees=0,land=0;
+ for(let r=0;r<R;r++)for(let c=0;c<C;c++){const x=G[r][c];if(x.t===3&&!x.canal)continue;land++;x.imm-=dt;
+  if(x.t===1){fires++;if(Math.random()<dt*3)puff((c+.5)*cell,(r+.5)*cell,Math.random()<.5?'e':'g');x.life-=dt;if(x.life<=0){x.t=2;if(x.a){x.a=null;dead++}}}
+  else if(x.t===0){trees++;if(x.rk>0){x.rk-=dt;if(x.rk<=0){x.imm=0;ignite(x)}}}}
+ forest=Math.round(trees/land*100);for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt*(p.k==='g'?.5:.9)}parts=parts.filter(p=>p.l>0);
+ sp+=dt;if(sp>Math.max(.25,.7-day*.06)){sp=0;spread()}
+ ev+=dt;if(ev>11){ev=0;fireEvent()}
+ gov+=dt*.6;if(gov>=99){gov=0;satgas()}if(Math.random()<dt*(.3+t*.015+day*.25))ignite(G[ri(0,R-1)][ri(0,C-1)]);if(rain>0)rain-=dt;if(fires&&Math.random()<dt*Math.min(fires,10)*.8)crack();
+ aqi+=fires*.5*dt;aqi-=(fires?1.5:6)*dt;aqi=Math.max(25,aqi);maxAqi=Math.max(maxAqi,aqi);
+ if(trees===0){end(false);return}
+ if(t>=DAYT)dayEnd();
+}
+let AC,NB,mute=false,sg,lp=0;function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();const b=AC.createBuffer(1,AC.sampleRate,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;NB=b}catch(e){return null}}if(AC.state==='suspended')AC.resume();return AC}
+function beep(f,d,ty,v,f2){if(mute||!ac())return;const o=AC.createOscillator(),n=AC.createGain(),T=AC.currentTime;o.type=ty||'sine';o.frequency.setValueAtTime(f,T);if(f2)o.frequency.exponentialRampToValueAtTime(f2,T+d);n.gain.setValueAtTime(v||.08,T);n.gain.exponentialRampToValueAtTime(.0001,T+d);o.connect(n).connect(AC.destination);o.start();o.stop(T+d)}
+function burst(d,f,v,hp){if(mute||!ac())return;const s=AC.createBufferSource(),fl=AC.createBiquadFilter(),n=AC.createGain(),T=AC.currentTime;s.buffer=NB;fl.type=hp?'highpass':'bandpass';fl.frequency.value=f;n.gain.setValueAtTime(v,T);n.gain.exponentialRampToValueAtTime(.0001,T+d);s.connect(fl).connect(n).connect(AC.destination);s.start();s.stop(T+d)}
+function hiss(on){if(!AC)return;if(!sg){const s=AC.createBufferSource(),fl=AC.createBiquadFilter();sg=AC.createGain();s.buffer=NB;s.loop=true;fl.type='bandpass';fl.frequency.value=1800;sg.gain.value=0;s.connect(fl).connect(sg).connect(AC.destination);s.start()}sg.gain.setTargetAtTime(on&&!mute?.1:0,AC.currentTime,.05)}
+function psh(){const n=performance.now();if(n-lp>90){lp=n;burst(.14,2600,.07)}}
+function crack(){burst(.04+Math.random()*.04,1500+Math.random()*3000,.05,1)}
+function sting(){beep(440,.35,'sawtooth',.05,220);setTimeout(()=>beep(330,.45,'sawtooth',.05,140),200)}
+function heli(){for(let i=0;i<14;i++)setTimeout(()=>beep(75,.07,'square',.05,55),i*85)}
+function thud(){beep(130,.18,'sine',.15,50)}
+function chime(){[523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.4,'triangle',.07),i*140))}
+function doom(){beep(260,1.4,'sawtooth',.07,45);burst(1.2,400,.08)}
+function boom(){const id=boom.g=(boom.g||0)+1;banner('📢 Pemerintah: “Kebakaran terkendali.” Api: “Belum diberi tahu.”');[[3,.12,'Angin kencang berembus. Titik api melompat ke mana-mana.'],[6,.2,'Kemarau memuncak. Gambut mulai membara dari bawah tanah.'],[9,.35,'Anggaran pemadaman dialihkan ke acara seremoni peresmian.'],[13,1,'Izin konsesi baru terbit. Seluruh hutan “kebetulan” terbakar bersamaan.']].forEach(([s,p,m])=>setTimeout(()=>{if(id!==boom.g||!run)return;banner('📢 '+m);for(const row of G)for(const x of row)if(x.t===0&&Math.random()<p){x.imm=0;ignite(x)}},s*1000))}function banner(txt){const b=$('ev');b.textContent=txt;b.classList.add('show');clearTimeout(evTimer);evTimer=setTimeout(()=>b.classList.remove('show'),5000)}function satgas(){evN++;heli();let n=3;for(const row of G)for(const x of row)if(n>0&&x.t===1&&Math.random()<.5){x.t=0;x.imm=4;n--}photo=4;banner('🚁 Satgas akhirnya tiba! Memadamkan 3 titik api, lalu konferensi pers 4 detik: “Situasi terkendali.”')}function alive(){let n=0;for(const row of G)for(const x of row)if(x.a)n++;return n}
+function draw(){
+ g.clearRect(0,0,cv.width,cv.height);g.font=`${cell*.7}px serif`;g.textAlign='center';g.textBaseline='middle';
+ for(let r=0;r<R;r++)for(let c=0;c<C;c++){const x=G[r][c],px=c*cell,py=r*cell;
+  g.fillStyle=x.t===3?(x.canal?'#3d9be0':'#2b6cb0'):x.t===2?'#2a2420':x.t===1?'#7a2a10':x.peat?'#244126':((r+c)%2?'#2e7d3a':'#2a7335');
+  g.fillRect(px,py,cell,cell);
+  if(x.t===0&&x.imm>0){g.fillStyle='rgba(80,160,255,.25)';g.fillRect(px,py,cell,cell)}
+  if(x.t===0&&!x.a)g.fillText('🌲',px+cell/2,py+cell/2+1);if(x.canal)g.fillText('🚧',px+cell/2,py+cell/2);
+  if(x.t===1){g.globalAlpha=.7+.3*Math.sin(performance.now()/90+r*c);g.shadowColor='#ff6a00';g.shadowBlur=18;g.fillText('🔥',px+cell/2,py+cell/2);g.shadowBlur=0;g.globalAlpha=1}
+  if(x.t===2&&x.peat){g.fillStyle='rgba(180,180,180,.25)';g.fillRect(px+cell*.3,py+cell*.3,cell*.4,cell*.4)}
+  if(x.a&&x.t!==1)g.fillText(x.a,px+cell/2,py+cell/2)}
+ if(ptr&&run){const pc=Math.floor(ptr.x/cell),pr=Math.floor(ptr.y/cell);g.strokeStyle=photo>0?'#f55':'#7cc4ff';g.lineWidth=2;g.strokeRect((pc-up.r)*cell,(pr-up.r)*cell,cell*(2*up.r+1),cell*(2*up.r+1));g.fillText(photo>0?'📸':'💧',pc*cell+cell/2,pr*cell+cell/2)}
+ for(const p of parts){g.globalAlpha=Math.max(0,p.l)*(p.k==='g'?.4:.9);g.fillStyle=p.k==='g'?'#888':p.k==='e'?'#ffb040':'#8fd0ff';g.beginPath();g.arc(p.x,p.y,cell*(p.k==='g'?.18+(1-p.l)*.25:.06),0,7);g.fill()}g.globalAlpha=1;g.fillStyle='rgba(255,110,30,'+(t/DAYT*.12)+')';g.fillRect(0,0,cv.width,cv.height);if(fires>8){const gr=g.createRadialGradient(cv.width/2,cv.height/2,cv.height*.4,cv.width/2,cv.height/2,cv.width*.7);gr.addColorStop(0,'rgba(255,60,0,0)');gr.addColorStop(1,'rgba(255,60,0,'+Math.min(.35,(fires-8)*.03)+')');g.fillStyle=gr;g.fillRect(0,0,cv.width,cv.height)}if(rain>0){g.strokeStyle='rgba(170,210,255,.55)';g.lineWidth=1.5;g.beginPath();for(let i=0;i<70;i++){const x=Math.random()*cv.width,y=Math.random()*cv.height;g.moveTo(x,y);g.lineTo(x-4,y+14)}g.stroke()}const a=Math.min(.6,(aqi-30)/500);if(a>0){g.fillStyle=`rgba(150,110,60,${a})`;g.fillRect(0,0,cv.width,cv.height)}
+ if(dm>0){const k=Math.min(1,dm/3.2),W=cv.width,H=cv.height;g.fillStyle='rgba(15,0,0,'+k*.78+')';g.fillRect(0,0,W,H);const gr=g.createLinearGradient(0,H,0,H*(1-.75*k));gr.addColorStop(0,'rgba(255,90,0,.9)');gr.addColorStop(1,'rgba(255,90,0,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);for(let i=0;i<70;i++){const ph=(dm*.35+i*.173)%1;g.fillStyle='rgba(255,'+(120+i)+',40,'+(.9-ph*.85)+')';g.fillRect(((i*.618)%1)*W+Math.sin(dm*2+i)*14,H*(1-ph),3,3)}if(dm<.4){g.fillStyle='rgba(255,230,190,'+(1-dm/.4)*.9+')';g.fillRect(0,0,W,H)}if(dm>.9){g.globalAlpha=Math.min(1,(dm-.9)/.8);g.shadowColor='#ff3300';g.shadowBlur=30;g.fillStyle='#ffe3d0';g.textAlign='center';g.textBaseline='middle';const fit=(s,px,b)=>{g.font=(b?'bold ':'')+px+'px system-ui,sans-serif';const w=g.measureText(s).width;if(w>W*.92)g.font=(b?'bold ':'')+px*W*.92/w+'px system-ui,sans-serif'};fit('HUTAN HABIS',cell*1.8,1);g.fillText('HUTAN HABIS',W/2,H*.4);const wsp=dmTxt.split(' '),hh=Math.ceil(wsp.length/2),l1=wsp.slice(0,hh).join(' '),l2=wsp.slice(hh).join(' ');fit(l1.length>l2.length?l1:l2,cell*.9);g.fillText(l1,W/2,H*.56);g.fillText(l2,W/2,H*.56+cell);g.shadowBlur=0;g.globalAlpha=1}}$('hPts').textContent=pts;$('nC').textContent=canals;$('hWind').textContent=wind[0]<0?'↑':wind[0]>0?'↓':wind[1]<0?'←':wind[1]>0?'→':'•';$('hDay').textContent=day;$('bDay').style.width=Math.min(100,t/DAYT*100)+'%';
+ $('hFor').textContent=forest+'%';$('hAni').textContent=alive()+' / '+total;
+ const q=aqi<50?'Baik':aqi<100?'Sedang':aqi<200?'Tidak Sehat':aqi<300?'Sangat Tidak Sehat':'Berbahaya';
+ $('hAqi').textContent=q+' ('+Math.round(aqi)+')';$('hTank').textContent=Math.round(tank)+'/'+up.tk;$('bTank').style.width=tank/up.tk*100+'%';
+ $('hGov').textContent=Math.floor(gov)+'% (sedang rapat)';$('bGov').style.width=gov+'%'}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;if(run)update(dt);if(dm>0)dm+=dt;hiss(!!(run&&ptr&&tank>0&&photo<=0));if(G)draw();requestAnimationFrame(loop)}
+const FACTS=[
+['Karhutla itu ulah manusia','Mayoritas kebakaran hutan dan lahan di Indonesia dipicu aktivitas manusia, terutama pembukaan lahan dengan cara dibakar karena murah dan cepat. Cuaca kering hanya memperparah, bukan penyebab utamanya.'],
+['Gambut: api yang tak mau mati','Lahan gambut yang dikeringkan mudah terbakar dan bisa membara di bawah tanah berpekan-pekan. Pemadaman permukaan saja sering tidak cukup, dan gambut menyimpan karbon dalam jumlah raksasa yang terlepas saat terbakar.'],
+['Yang paling menderita tak bisa bicara','Orangutan, harimau sumatra, gajah, dan burung kehilangan rumah serta sumber makan. Banyak yang mati terbakar, terjebak asap, atau terdesak ke permukiman dan berakhir konflik dengan manusia.'],
+['Asap tidak mengenal batas','Pada karhutla besar 2015, luas lahan terbakar sekitar 2,6 juta hektare menurut Bank Dunia. Jutaan warga terpapar asap, ISPA meningkat, sekolah diliburkan, dan kabut sampai ke negara tetangga.'],['Penegakan hukum sering dikritik','Penanganan kasus pembakaran lahan kerap dikritik: sorotan lebih sering jatuh pada pelaku lapangan, sementara pemberi perintah dan pemilik modal jarang tersentuh. Tanpa efek jera, membakar tetap jadi cara termurah membuka lahan.'],['Mencegah jauh lebih murah','Membasahi kembali gambut dengan sekat kanal biasanya lebih murah daripada memadamkan kebakaran yang berulang tiap kemarau. Pencegahan sebelum musim kering lebih efektif daripada pemadaman darurat.'],['Dampak bagi kesehatan','Asap karhutla mengandung partikel halus PM2,5 yang memicu ISPA, memperburuk asma, dan paling berbahaya bagi anak, ibu hamil, dan lansia. Dampaknya bisa terasa lama setelah api padam.']];
+const STAT=['“Terkendali” ✔','“Sesuai rencana” ✔','“Aman dan kondusif” ✔','“Sudah ditangani” ✔'];const DOOMSUB=['Api tidak menunggu rapat selesai.','Tidak ada yang tersisa untuk diselamatkan.','Semua yang hijau kini abu-abu.','Satwa kehilangan rumah. Kita kehilangan alasan untuk bilang “tidak tahu”.','Asapnya sampai ke mana-mana. Tanggung jawabnya ke mana?','Hutan tumbuh puluhan tahun, habis dalam hitungan hari.'];const LOSE=['Hutan habis. Pejabat: “Kami sudah bekerja maksimal.”','Hutan habis. Pejabat: “Ini bencana alam, bukan kelalaian.” Alam: “Bukan saya.”','Hutan habis. Pejabat: “Kami akan evaluasi.” Evaluasi ini adalah yang ke-27.','Hutan habis. Pejabat: “Penyebabnya multifaktor.” Faktor utamanya: tidak ada yang mau bertanggung jawab.','Hutan habis. Pejabat: “Mohon masyarakat bersabar.” Hutannya tidak sempat.','Hutan habis. Dana penanganan sudah dianggarkan, untuk rapat tahun depan.','Hutan habis. Pejabat: “Kami sudah turun ke lapangan.” Lapangannya sudah menjadi abu.','Hutan habis. Pejabat: “Titik apinya sudah tidak ada.” Memang tidak ada lagi yang tersisa untuk dibakar.','Hutan habis. Pejabat: “Pelakunya sedang kami dalami.” Pendalaman dimulai sejak musim kemarau lalu.','Hutan habis. Pejabat: “Ini momentum untuk reboisasi.” Peresmian penanaman: hari Senin, dengan spanduk besar.','Hutan habis. Pejabat: “Kami berduka.” Rapat dukacita ditunda karena bentrok jadwal.'];function showMsg(h){$('msg').innerHTML=h;$('ovMsg').classList.remove('hide')}
+function dayEnd(){run=false;ptr=null;chime();const f=FACTS[(day-1)%FACTS.length];
+ 
+ shop(f)}function shop(f){const U=[['👥 Relawan tambahan: semprotan lebih lebar',30,()=>{up.r=2},up.r>=2],['🛢️ Tangki lebih besar (+40)',20,()=>{up.tk+=40},false],['🚰 Pompa lebih cepat (+6/dtk)',20,()=>{up.rg+=6},false]];showMsg(`<h2>Hari ${day} selesai 🌅</h2><p>Hutan <b>${forest}%</b> • satwa selamat <b>${alive()}</b> • Poin ⭐ <b>${pts}</b></p><p><b>Fakta: ${f[0]}</b><br>${f[1]}</p><p><b>Swadaya warga</b> (dibiayai poin solidaritas; anggaran pemerintah belum disetujui. Catatan: tidak satu pun upgrade ini akan menyelamatkan hutan):</p>${U.map((u,i)=>`<button class='up' data-i='${i}' ${pts<u[1]||u[3]?'disabled':''}>${u[0]} — ${u[1]} poin</button>`).join('<br>')}<br><button id='nx'>Lanjut ke hari ${day+1}</button>`);document.querySelectorAll('.up').forEach(b=>b.onclick=()=>{const u=U[b.dataset.i];if(pts>=u[1]){pts-=u[1];u[2]();shop(f)}});
+ $('nx').onclick=()=>{day++;$('ovMsg').classList.add('hide');init(false);run=true}}
+function end(win){if(!win&&!dm){run=false;ptr=null;dm=.001;dmTxt=DOOMSUB[ri(0,DOOMSUB.length-1)];cv.classList.add('quake');doom();burst(3.5,250,.12);for(let i=0;i<5;i++)setTimeout(()=>beep(200,.5,'sawtooth',.04,120),i*700);setTimeout(()=>end(false),4200);return}cv.classList.remove('quake');dm=0;run=false;ptr=null;const al=alive(),f=FACTS[ri(0,FACTS.length-1)];
+ const grade=!win?LOSE[ri(0,LOSE.length-1)]:(forest>=70&&al>=10)?'Kamu berhasil menyelamatkan sebagian besar rumah kita. Di dunia nyata, tidak ada tombol restart.':'Kamu bertahan, tapi dengan kerugian besar. Beginilah akibat pencegahan yang terlambat.';
+ showMsg(`<h2>${win?'Empat hari terlewati':'Game over 🔥'}</h2><p>${grade}</p><p>Hutan tersisa <b>${forest}%</b> • Satwa selamat <b>${al}/${total}</b> • Puncak ISPU <b>${Math.round(maxAqi)}</b></p><p>📋 <b>Rapor resmi pemerintah:</b> kebijakan yang menghambatmu <b>${evN}</b> • serapan anggaran seremoni <b>100%</b> • kondisi hutan <b>${forest}%</b> • status resmi: <b>${STAT[ri(0,STAT.length-1)]}</b></p><p>${win?'':'Gugur sebelum rapat koordinasi pertama dimulai. '}${al<=4?'Hutan sunyi, nyaris tak ada satwa tersisa. ':al>=12?'Sebagian besar satwa lolos, ke hutan yang makin sempit. ':''}${maxAqi>400?'Langit berubah oranye dan sekolah diliburkan berpekan-pekan.':'Asap menyelimuti permukiman sekitar.'}</p><p style='border-left:3px solid #ff7a2f;padding-left:10px'><b>Game ini memang tidak bisa dimenangkan.</b> Sama seperti di dunia nyata: warga dengan selang tidak akan menang melawan karhutla yang dibiarkan membesar. Yang menang hanya pencegahan: izin dan tata kelola lahan yang jujur, restorasi gambut, penegakan hukum yang tegas sampai ke pemberi perintah, dan peringatan dini sebelum kemarau. Kamu bertahan sekitar 15 detik; mereka punya waktu bertahun-tahun untuk mencegahnya.</p>
+ <p><b>Fakta: ${f[0]}</b><br>${f[1]}</p>
+ <p><b>Yang bisa kita lakukan:</b> jangan membakar lahan; laporkan titik api dan pembakaran ke layanan darurat 112 atau pemerintah daerah; pantau titik panas lewat SiPongi KLHK; dukung penegakan hukum yang transparan dan restorasi gambut; pakai masker saat asap tebal dan lindungi anak serta lansia.</p>
+ <button id="rs">Main lagi</button>`);
+ $('rs').onclick=()=>{$('ovMsg').classList.add('hide');aqi=25;init(true);run=true;boom()}}
+function pos(e){const b=cv.getBoundingClientRect();return{x:(e.clientX-b.left)*cv.width/b.width,y:(e.clientY-b.top)*cv.height/b.height}}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(tool===1){const rr=Math.floor(p.y/cell),cc=Math.floor(p.x/cell),x=G[rr]?.[cc];if(run&&canals>0&&x&&x.t===0&&!x.a){x.t=3;x.canal=1;canals--;thud();for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=G[rr+a]?.[cc+b];if(n&&n.t===0){n.peat=false;n.imm=Math.max(n.imm,6)}}for(let k=0;k<5;k++)puff(p.x,p.y,'w')}return}ptr=p;cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(ptr)ptr=pos(e)});
+['pointerup','pointercancel','pointerleave'].forEach(n=>cv.addEventListener(n,()=>{ptr=null}));
+$('go').onclick=()=>{ac();$('ovStart').classList.add('hide');init(true);run=true;boom()};
+function sync(){$('tW').classList.toggle('on',tool===0);$('tC').classList.toggle('on',tool===1);cv.style.cursor=tool?'cell':'crosshair'}$('tW').onclick=()=>{tool=0;sync()};$('tC').onclick=()=>{tool=1;sync()};$('tM').onclick=()=>{mute=!mute;$('tM').textContent=mute?'🔇':'🔊'};addEventListener('keydown',e=>{if(e.key==='1'||e.key==='2'){tool=e.key-1;sync()}});resize();init(true);requestAnimationFrame(loop);
+</script></body></html>
